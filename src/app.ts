@@ -1,19 +1,27 @@
-// class Student {
-//   fullName: string;
-//   constructor(public firstName: string, public middleInitial: string, public lastName: string) {
-//       this.fullName = firstName + " " + middleInitial + " " + lastName;
-//   }
-// }
+export default class Cell {
+    isAlive: boolean;
+    cellWidth: number;
+    cellCoords: Coords;
+    constructor(alive: boolean, cellSize: number, myCoords: Coords){
+        this.isAlive = alive;
+        this.cellWidth = cellSize;
+        this.cellCoords = myCoords;
+    }
+}
 
-// interface Person {
-//   firstName: string;
-//   lastName: string;
-// }
+export interface Coords {
+    coordX: number;
+    coordY: number;
+}
 
-// function greeter(person : Person) {
-//   return "Hello, " + person.firstName + " " + person.lastName;
-// }
-
-// let user = new Student("Jane", "M.", "User");
-
-// document.body.innerHTML = greeter(user);
+export function initGame(cellArray: Array<Cell>){
+    let i = 0;
+    while (i < 400){
+        let j = 0;
+        while ( j < 400 ) {
+            cellArray.push(new Cell(false, 4, {coordX: j, coordY: i}));
+            j += 4;
+        }
+        i += 4;
+    }
+}

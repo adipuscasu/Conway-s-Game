@@ -1,15 +1,8 @@
-class Student {
-    fullName: string;
-    constructor(public firstName: string, public middleInitial: string, public lastName: string) {
-        this.fullName = firstName + " " + middleInitial + " " + lastName;
-    }
-}
-
 class Cell {
     isAlive: boolean;
     cellWidth: number;
     cellCoords: Coords;
-    constructor(public alive: boolean, public cellSize: number, public myCoords: Coords){
+    constructor(alive: boolean, cellSize: number, myCoords: Coords){
         this.isAlive = alive;
         this.cellWidth = cellSize;
         this.cellCoords = myCoords;
@@ -19,16 +12,6 @@ class Cell {
 interface Coords {
     coordX: number;
     coordY: number;
-}
-
-
-interface Person {
-    firstName: string;
-    lastName: string;
-}
-
-function greeter(person : Person) {
-    return "Hello, " + person.firstName + " " + person.lastName;
 }
 
 function initGame(cellArray: Array<Cell>){
@@ -43,17 +26,13 @@ function initGame(cellArray: Array<Cell>){
     }
 }
 
-
-
-let user = new Student("Jane", "M.", "User");
-
-//document.body.innerHTML = greeter(user);
 window.onload = function () {
     let drawingSurface = <HTMLCanvasElement> document.getElementById("drawingSurface");
     let elemLeft = drawingSurface.offsetLeft;
     let elemTop = drawingSurface.offsetTop;
     let ctxt = drawingSurface.getContext("2d");
-    let isGameStarted = false;
+    let isGameStarted : boolean = false;
+    let noOfGenerations : number = 0;
 
     drawingSurface.addEventListener("click", function(event){
         let x = event.pageX - elemLeft,
@@ -67,8 +46,10 @@ window.onload = function () {
 
     function drawGame(){
         myArray.forEach(function(cell){
-            ctxt.fillStyle = cell.isAlive ? "#000000" : "#FFFFFF";
-            ctxt.fillRect(cell.cellCoords.coordX, cell.cellCoords.coordY, cell.cellSize, cell.cellSize);
+            if (ctxt){
+                ctxt.fillStyle = cell.isAlive ? "#000000" : "#FFFFFF";
+                ctxt.fillRect(cell.cellCoords.coordX, cell.cellCoords.coordY, cell.cellWidth, cell.cellWidth);
+            }
         });
     }
 
@@ -79,6 +60,42 @@ window.onload = function () {
                 console.log(cell.isAlive);
                 drawGame();
             }
+        });
+    }
+
+    function getCellNeighbours (cell : Cell) {
+        let liveCellsCount : number = 0;
+        myArray.forEach(element => {
+            switch (element.cellCoords) {
+                case {coordX: cell.cellCoords.coordX, coordY : cell.cellCoords.coordY - 4}:
+                    liveCellsCount ++;
+                    break;
+                case {coordX: cell.cellCoords.coordX, coordY : cell.cellCoords.coordY + 4}:
+                    liveCellsCount ++;
+                    break;
+                case {coordX: cell.cellCoords.coordX + 4, coordY : cell.cellCoords.coordY}:
+                    liveCellsCount ++;
+                    break;
+                case {coordX: cell.cellCoords.coordX - 4, coordY : cell.cellCoords.coordY}:
+                    liveCellsCount ++;
+                    break;
+                    case {coordX: cell.cellCoords.coordX - 4, coordY : cell.cellCoords.coordY - 4}:
+                    liveCellsCount ++;
+                    break;
+                case {coordX: cell.cellCoords.coordX + 4, coordY : cell.cellCoords.coordY + 4}:
+                    liveCellsCount ++;
+                    break;
+                case {coordX: cell.cellCoords.coordX - 4, coordY : cell.cellCoords.coordY + 4}:
+                    liveCellsCount ++;
+                    break;
+                case {coordX: cell.cellCoords.coordX + 4, coordY : cell.cellCoords.coordY - 4}:
+                    liveCellsCount ++;
+                    break;
+                default:
+                    liveCellsCount = 0;
+                    break;
+            }
+            return liveCellsCount;
         });
     }
 

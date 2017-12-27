@@ -1,26 +1,11 @@
-var Student = /** @class */ (function () {
-    function Student(firstName, middleInitial, lastName) {
-        this.firstName = firstName;
-        this.middleInitial = middleInitial;
-        this.lastName = lastName;
-        this.fullName = firstName + " " + middleInitial + " " + lastName;
-    }
-    return Student;
-}());
 var Cell = /** @class */ (function () {
     function Cell(alive, cellSize, myCoords) {
-        this.alive = alive;
-        this.cellSize = cellSize;
-        this.myCoords = myCoords;
         this.isAlive = alive;
         this.cellWidth = cellSize;
         this.cellCoords = myCoords;
     }
     return Cell;
 }());
-function greeter(person) {
-    return "Hello, " + person.firstName + " " + person.lastName;
-}
 function initGame(cellArray) {
     var i = 0;
     while (i < 400) {
@@ -32,8 +17,6 @@ function initGame(cellArray) {
         i += 4;
     }
 }
-var user = new Student("Jane", "M.", "User");
-//document.body.innerHTML = greeter(user);
 window.onload = function () {
     var drawingSurface = document.getElementById("drawingSurface");
     var elemLeft = drawingSurface.offsetLeft;
@@ -51,7 +34,7 @@ window.onload = function () {
     function drawGame() {
         myArray.forEach(function (cell) {
             ctxt.fillStyle = cell.isAlive ? "#000000" : "#FFFFFF";
-            ctxt.fillRect(cell.cellCoords.coordX, cell.cellCoords.coordY, cell.cellSize, cell.cellSize);
+            ctxt.fillRect(cell.cellCoords.coordX, cell.cellCoords.coordY, cell.cellWidth, cell.cellWidth);
         });
     }
     function setCell(coords) {
@@ -61,6 +44,41 @@ window.onload = function () {
                 console.log(cell.isAlive);
                 drawGame();
             }
+        });
+    }
+    function getCellNeighbours(cell) {
+        var liveCellsCount = 0;
+        myArray.forEach(function (element) {
+            switch (element.cellCoords) {
+                case { coordX: cell.cellCoords.coordX, coordY: cell.cellCoords.coordY - 4 }:
+                    liveCellsCount++;
+                    break;
+                case { coordX: cell.cellCoords.coordX, coordY: cell.cellCoords.coordY + 4 }:
+                    liveCellsCount++;
+                    break;
+                case { coordX: cell.cellCoords.coordX + 4, coordY: cell.cellCoords.coordY }:
+                    liveCellsCount++;
+                    break;
+                case { coordX: cell.cellCoords.coordX - 4, coordY: cell.cellCoords.coordY }:
+                    liveCellsCount++;
+                    break;
+                case { coordX: cell.cellCoords.coordX - 4, coordY: cell.cellCoords.coordY - 4 }:
+                    liveCellsCount++;
+                    break;
+                case { coordX: cell.cellCoords.coordX + 4, coordY: cell.cellCoords.coordY + 4 }:
+                    liveCellsCount++;
+                    break;
+                case { coordX: cell.cellCoords.coordX - 4, coordY: cell.cellCoords.coordY + 4 }:
+                    liveCellsCount++;
+                    break;
+                case { coordX: cell.cellCoords.coordX + 4, coordY: cell.cellCoords.coordY - 4 }:
+                    liveCellsCount++;
+                    break;
+                default:
+                    liveCellsCount = 0;
+                    break;
+            }
+            return liveCellsCount;
         });
     }
 };
