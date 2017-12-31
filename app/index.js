@@ -47,7 +47,6 @@ window.onload = function () {
     }
     drawingSurface.addEventListener("click", function (event) {
         var x = event.pageX - elemLeft, y = event.pageY - elemTop;
-        console.log("clicked at: ", x, y);
         setCell({ coordX: Math.floor(x / cellSize) * cellSize, coordY: Math.floor(y / cellSize) * cellSize });
     });
     function drawGame(drawArray) {
@@ -98,7 +97,6 @@ window.onload = function () {
         return liveCellsCount;
     }
     function iterationStarted() {
-        //while (cancelled === false) {
         // process the next generation array
         nextGenerationArray = getNextGeneration(myArray);
         // replace the game array with the new generation array
@@ -106,7 +104,6 @@ window.onload = function () {
         drawGame(myArray);
         noOfGenerations++;
         writeIterationsNumber(noOfGenerations);
-        //}
     }
     function getNextGeneration(cellArray) {
         var innerArray = new Array();
@@ -127,7 +124,6 @@ window.onload = function () {
             var innerElement = new Cell(aliveStatus, cellSize, cellArrayElement.cellCoords);
             innerArray.push(innerElement);
         });
-        console.log(cellArray, innerArray);
         return innerArray;
     }
     function writeIterationsNumber(iterationsNumber) {
