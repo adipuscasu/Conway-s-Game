@@ -47,7 +47,8 @@ window.onload = function () {
     }
     drawingSurface.addEventListener("click", function (event) {
         var x = event.pageX - elemLeft, y = event.pageY - elemTop;
-        setCell({ coordX: Math.floor(x / cellSize) * cellSize, coordY: Math.floor(y / cellSize) * cellSize });
+        inverseCellLiveStatus({ coordX: Math.floor(x / cellSize) * cellSize, coordY: Math.floor(y / cellSize) * cellSize });
+        drawGame(myArray);
     });
     function drawGame(drawArray) {
         if (!drawArray) {
@@ -63,14 +64,12 @@ window.onload = function () {
             }
         });
     }
-    function setCell(coords) {
+    function inverseCellLiveStatus(coords) {
         myArray.forEach(function (cell) {
             if (cell.cellCoords.coordX === coords.coordX && cell.cellCoords.coordY === coords.coordY) {
                 cell.isAlive = !cell.isAlive;
-                console.log(cell.isAlive);
             }
         });
-        drawGame(myArray);
     }
     function getCellNeighbours(cell, cellArray) {
         var liveCellsCount = 0;
