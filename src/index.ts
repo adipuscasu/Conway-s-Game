@@ -34,6 +34,14 @@ window.onload = function () {
     let ctxt = drawingSurface.getContext("2d");
     let isGameStarted : boolean = false;
     let noOfGenerations : number = 0;
+    let counter : number = 0;
+    let evt = new Event("startGame", {"bubbles": true, "cancelable": true});
+    let cancelled : boolean = false;
+    // watch for triggering the startGame event
+    document.addEventListener("startGame", function(e) {
+        console.log("test", e);
+        iterationStarted();
+    });
 
     let myArray = new Array();
     initGame(myArray);
@@ -41,11 +49,13 @@ window.onload = function () {
 
     if (elmButton) {
         elmButton.addEventListener("click", function(event){
-            isGameStarted = true;
-            console.log("isGameStarted is set to true");
-            iterationStarted();
+            isGameStarted = !isGameStarted;
+            // Trigger the gameStart event
+            cancelled = !document.dispatchEvent(evt);
         });
     }
+
+
     drawingSurface.addEventListener("click", function(event){
         let x = event.pageX - elemLeft,
             y = event.pageY - elemTop;
@@ -80,57 +90,60 @@ window.onload = function () {
 
     function getCellNeighbours (cell : Cell) : number  {
         let liveCellsCount : number = 0;
-        myArray.forEach(element => {
+        myArray.forEach(function(element, index) {
             if (!element) {
                 return;
             }
-            switch (element.cellCoords) {
-                case {coordX: cell.cellCoords.coordX, coordY : cell.cellCoords.coordY - 4}:
-                    liveCellsCount ++;
-                    break;
-                case {coordX: cell.cellCoords.coordX, coordY : cell.cellCoords.coordY + 4}:
-                    liveCellsCount ++;
-                    break;
-                case {coordX: cell.cellCoords.coordX + 4, coordY : cell.cellCoords.coordY}:
-                    liveCellsCount ++;
-                    break;
-                case {coordX: cell.cellCoords.coordX - 4, coordY : cell.cellCoords.coordY}:
-                    liveCellsCount ++;
-                    break;
-                    case {coordX: cell.cellCoords.coordX - 4, coordY : cell.cellCoords.coordY - 4}:
-                    liveCellsCount ++;
-                    break;
-                case {coordX: cell.cellCoords.coordX + 4, coordY : cell.cellCoords.coordY + 4}:
-                    liveCellsCount ++;
-                    break;
-                case {coordX: cell.cellCoords.coordX - 4, coordY : cell.cellCoords.coordY + 4}:
-                    liveCellsCount ++;
-                    break;
-                case {coordX: cell.cellCoords.coordX + 4, coordY : cell.cellCoords.coordY - 4}:
-                    liveCellsCount ++;
-                    break;
-                default:
-                    liveCellsCount = 0;
-                    break;
+                const cX : number = element.cellCoords.coordX;
+                const cY : number = element.cellCoords.coordY;
+
+                switch (cX, cY) {
+                    case (cell.cellCoords.coordX, cell.cellCoords.coordY - 4):
+                        liveCellsCount ++;
+                        break;
+                    case (cell.cellCoords.coordX, cell.cellCoords.coordY + 4):
+                        liveCellsCount ++;
+                        break;
+                    case (cell.cellCoords.coordX + 4, cell.cellCoords.coordY):
+                        liveCellsCount ++;
+                        break;
+                    case (cell.cellCoords.coordX - 4, cell.cellCoords.coordY):
+                        liveCellsCount ++;
+                        break;
+                    case (cell.cellCoords.coordX - 4, cell.cellCoords.coordY - 4):
+                        liveCellsCount ++;
+                        break;
+                    case (cell.cellCoords.coordX + 4, cell.cellCoords.coordY + 4):
+                        liveCellsCount ++;
+                        break;
+                    case (cell.cellCoords.coordX - 4, cell.cellCoords.coordY + 4):
+                        liveCellsCount ++;
+                        break;
+                    case (cell.cellCoords.coordX + 4, cell.cellCoords.coordY - 4):
+                        liveCellsCount ++;
+                        break;
+                    default:
+                        liveCellsCount = 0;
+                        break;
             }
-            
+
+
         });
         return liveCellsCount;
     }
 
     function iterationStarted(){
-        while (isGameStarted === true) {
-            console.log(myArray);
-            console.log("myArray in iterations started");
+        //while (cancelled === false) {
             myArray = getNextGeneration();
             drawGame(myArray);
             noOfGenerations ++;
             writeIterationsNumber(noOfGenerations);
-        }
+        //}
     }
 
     function getNextGeneration (){
-        let newGeneration = myArray.slice(0).map( function (cellEllement){
+        let newGeneration = myArray.slice(0);
+        newGeneration.forEach(function (cellEllement, index){
             if (!cellEllement) {
                 return;
             }

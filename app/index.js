@@ -25,14 +25,22 @@ window.onload = function () {
     var ctxt = drawingSurface.getContext("2d");
     var isGameStarted = false;
     var noOfGenerations = 0;
+    var counter = 0;
+    var evt = new Event("startGame", { "bubbles": true, "cancelable": true });
+    var cancelled = false;
+    // watch for triggering the startGame event
+    document.addEventListener("startGame", function (e) {
+        console.log("test", e);
+        iterationStarted();
+    });
     var myArray = new Array();
     initGame(myArray);
     drawGame(myArray);
     if (elmButton) {
         elmButton.addEventListener("click", function (event) {
-            isGameStarted = true;
-            console.log("isGameStarted is set to true");
-            iterationStarted();
+            isGameStarted = !isGameStarted;
+            // Trigger the gameStart event
+            cancelled = !document.dispatchEvent(evt);
         });
     }
     drawingSurface.addEventListener("click", function (event) {
@@ -65,33 +73,35 @@ window.onload = function () {
     }
     function getCellNeighbours(cell) {
         var liveCellsCount = 0;
-        myArray.forEach(function (element) {
+        myArray.forEach(function (element, index) {
             if (!element) {
                 return;
             }
-            switch (element.cellCoords) {
-                case { coordX: cell.cellCoords.coordX, coordY: cell.cellCoords.coordY - 4 }:
+            var cX = element.cellCoords.coordX;
+            var cY = element.cellCoords.coordY;
+            switch (cX, cY) {
+                case (cell.cellCoords.coordX, cell.cellCoords.coordY - 4):
                     liveCellsCount++;
                     break;
-                case { coordX: cell.cellCoords.coordX, coordY: cell.cellCoords.coordY + 4 }:
+                case (cell.cellCoords.coordX, cell.cellCoords.coordY + 4):
                     liveCellsCount++;
                     break;
-                case { coordX: cell.cellCoords.coordX + 4, coordY: cell.cellCoords.coordY }:
+                case (cell.cellCoords.coordX + 4, cell.cellCoords.coordY):
                     liveCellsCount++;
                     break;
-                case { coordX: cell.cellCoords.coordX - 4, coordY: cell.cellCoords.coordY }:
+                case (cell.cellCoords.coordX - 4, cell.cellCoords.coordY):
                     liveCellsCount++;
                     break;
-                case { coordX: cell.cellCoords.coordX - 4, coordY: cell.cellCoords.coordY - 4 }:
+                case (cell.cellCoords.coordX - 4, cell.cellCoords.coordY - 4):
                     liveCellsCount++;
                     break;
-                case { coordX: cell.cellCoords.coordX + 4, coordY: cell.cellCoords.coordY + 4 }:
+                case (cell.cellCoords.coordX + 4, cell.cellCoords.coordY + 4):
                     liveCellsCount++;
                     break;
-                case { coordX: cell.cellCoords.coordX - 4, coordY: cell.cellCoords.coordY + 4 }:
+                case (cell.cellCoords.coordX - 4, cell.cellCoords.coordY + 4):
                     liveCellsCount++;
                     break;
-                case { coordX: cell.cellCoords.coordX + 4, coordY: cell.cellCoords.coordY - 4 }:
+                case (cell.cellCoords.coordX + 4, cell.cellCoords.coordY - 4):
                     liveCellsCount++;
                     break;
                 default:
@@ -102,17 +112,16 @@ window.onload = function () {
         return liveCellsCount;
     }
     function iterationStarted() {
-        while (isGameStarted === true) {
-            console.log(myArray);
-            console.log("myArray in iterations started");
-            myArray = getNextGeneration();
-            drawGame(myArray);
-            noOfGenerations++;
-            writeIterationsNumber(noOfGenerations);
-        }
+        //while (cancelled === false) {
+        myArray = getNextGeneration();
+        drawGame(myArray);
+        noOfGenerations++;
+        writeIterationsNumber(noOfGenerations);
+        //}
     }
     function getNextGeneration() {
-        var newGeneration = myArray.slice(0).map(function (cellEllement) {
+        var newGeneration = myArray.slice(0);
+        newGeneration.forEach(function (cellEllement, index) {
             if (!cellEllement) {
                 return;
             }
