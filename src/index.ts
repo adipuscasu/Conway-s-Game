@@ -14,15 +14,15 @@ interface Coords {
     coordY: number;
 }
 
-function initGame(cellArray: Array<Cell>) {
+function initGame(cellArray: Array<Cell>, cellSize: number) {
     let i = 0;
     while (i < 400){
         let j = 0;
         while ( j < 400 ) {
-            cellArray.push(new Cell(false, 4, {coordX: j, coordY: i}));
-            j += 4;
+            cellArray.push(new Cell(false, cellSize, {coordX: j, coordY: i}));
+            j += cellSize;
         }
-        i += 4;
+        i += cellSize;
     }
 }
 
@@ -37,20 +37,22 @@ window.onload = function () {
     let counter : number = 0;
     let evt = new Event("startGame", {"bubbles": true, "cancelable": true});
     let cancelled : boolean = false;
+    const cellSize: number = 80;
     // watch for triggering the startGame event
     document.addEventListener("startGame", function(e) {
         console.log("test", e);
         iterationStarted();
     });
 
-    let myArray = new Array();
-    initGame(myArray);
+    let myArray : Array<Cell> = new Array();
+    let nextGenerationArray : Array<Cell> = new Array();
+    initGame(myArray, cellSize);
     drawGame(myArray);
 
     if (elmButton) {
         elmButton.addEventListener("click", function(event){
             isGameStarted = !isGameStarted;
-            // Trigger the gameStart event
+            // Trigger the gameStart event here
             cancelled = !document.dispatchEvent(evt);
         });
     }
@@ -60,7 +62,7 @@ window.onload = function () {
         let x = event.pageX - elemLeft,
             y = event.pageY - elemTop;
         console.log("clicked at: ", x, y);
-        setCell({coordX: Math.floor(x / 4) * 4, coordY: Math.floor(y / 4) * 4});
+        setCell({coordX: Math.floor(x / cellSize) * cellSize, coordY: Math.floor(y / cellSize) * cellSize});
     });
 
     function drawGame(drawArray : Array<Cell>) {
@@ -88,79 +90,70 @@ window.onload = function () {
         drawGame(myArray);
     }
 
-    function getCellNeighbours (cell : Cell) : number  {
+    function getCellNeighbours (cell : Cell, cellArray: Array<Cell>) : number  {
         let liveCellsCount : number = 0;
-        myArray.forEach(function(element, index) {
-            if (!element) {
-                return;
-            }
-                const cX : number = element.cellCoords.coordX;
-                const cY : number = element.cellCoords.coordY;
+        // set the 8 neighbours coords
+        let neighboursArray : Array<any> = new Array;
+        neighboursArray.push([cell.cellCoords.coordX, cell.cellCoords.coordY - cell.cellWidth]);
+        neighboursArray.push([cell.cellCoords.coordX, cell.cellCoords.coordY + cell.cellWidth]);
+        neighboursArray.push([cell.cellCoords.coordX - cell.cellWidth, cell.cellCoords.coordY]);
+        neighboursArray.push([cell.cellCoords.coordX + cell.cellWidth, cell.cellCoords.coordY]);
+        neighboursArray.push([cell.cellCoords.coordX - cell.cellWidth, cell.cellCoords.coordY - cell.cellWidth]);
+        neighboursArray.push([cell.cellCoords.coordX + cell.cellWidth, cell.cellCoords.coordY - cell.cellWidth]);
+        neighboursArray.push([cell.cellCoords.coordX - cell.cellWidth, cell.cellCoords.coordY + cell.cellWidth]);
+        neighboursArray.push([cell.cellCoords.coordX + cell.cellWidth, cell.cellCoords.coordY + cell.cellWidth]);
+        // get live status for every neighbour
+        neighboursArray.forEach( function (coordsArray) {
+            cellArray.forEach(function(cellToCheck){
+                if (coordsArray[0] === cellToCheck.cellCoords.coordX
+                    && coordsArray[1] === cellToCheck.cellCoords.coordY
+                    && cellToCheck.isAlive
+                ) {
+                    liveCellsCount ++;
+                }
+            })
+        } );
 
-                switch (cX, cY) {
-                    case (cell.cellCoords.coordX, cell.cellCoords.coordY - 4):
-                        liveCellsCount ++;
-                        break;
-                    case (cell.cellCoords.coordX, cell.cellCoords.coordY + 4):
-                        liveCellsCount ++;
-                        break;
-                    case (cell.cellCoords.coordX + 4, cell.cellCoords.coordY):
-                        liveCellsCount ++;
-                        break;
-                    case (cell.cellCoords.coordX - 4, cell.cellCoords.coordY):
-                        liveCellsCount ++;
-                        break;
-                    case (cell.cellCoords.coordX - 4, cell.cellCoords.coordY - 4):
-                        liveCellsCount ++;
-                        break;
-                    case (cell.cellCoords.coordX + 4, cell.cellCoords.coordY + 4):
-                        liveCellsCount ++;
-                        break;
-                    case (cell.cellCoords.coordX - 4, cell.cellCoords.coordY + 4):
-                        liveCellsCount ++;
-                        break;
-                    case (cell.cellCoords.coordX + 4, cell.cellCoords.coordY - 4):
-                        liveCellsCount ++;
-                        break;
-                    default:
-                        liveCellsCount = 0;
-                        break;
-            }
-
-
-        });
         return liveCellsCount;
     }
 
     function iterationStarted(){
         //while (cancelled === false) {
-            myArray = getNextGeneration();
+            // process the next generation array
+            nextGenerationArray = getNextGeneration(myArray);
+            // replace the game array with the new generation array
+            myArray = nextGenerationArray;
+
             drawGame(myArray);
+
             noOfGenerations ++;
             writeIterationsNumber(noOfGenerations);
         //}
     }
 
-    function getNextGeneration (){
-        let newGeneration = myArray.slice(0);
-        newGeneration.forEach(function (cellEllement, index){
-            if (!cellEllement) {
-                return;
-            }
-            const neighbours : number = getCellNeighbours(cellEllement);
+    function getNextGeneration (cellArray: Array<Cell>){
+        let innerArray : Array<Cell> = new Array();
+        let aliveStatus : boolean = false;
+
+        cellArray.forEach( function(cellArrayElement){
+            const neighbours : number = getCellNeighbours(cellArrayElement, cellArray);
             switch (neighbours) {
                 case 2:
-                    cellEllement.isAlive = cellEllement.isAlive;
+                    aliveStatus = cellArrayElement.isAlive;
                     break;
                 case 3:
-                    cellEllement.isAlive = true;
+                    aliveStatus = true;
                     break;
                 default:
-                    cellEllement.isAlive = false;
+                    aliveStatus = false;
                     break;
             }
+            const innerElement : Cell = new Cell(aliveStatus, cellSize, cellArrayElement.cellCoords);
+
+            innerArray.push(innerElement);
         });
-        return newGeneration;
+        console.log(cellArray, innerArray);
+        return innerArray;
     }
 
     function writeIterationsNumber (iterationsNumber : number) {

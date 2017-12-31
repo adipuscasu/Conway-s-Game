@@ -1,12 +1,18 @@
 # conway-game
 
-An awesome MVC typescript project, that displays Hello World.
+A typescript project, that displays  a finite two-dimensional orthogonal grid of square cells, each of which is in one of two possible states, live or dead. Every cell interacts with its eight neighbours, which are the cells that are directly horizontally, vertically, or diagonally adjacent. At each step in time, the following transitions occur:
+
+Any live cell with fewer than two live neighbours dies (referred to as underpopulation or exposure[1]).
+Any live cell with more than three live neighbours dies (referred to as overpopulation or overcrowding).
+Any live cell with two or three live neighbours lives, unchanged, to the next generation.
+Any dead cell with exactly three live neighbours will come to life.
+The initial pattern constitutes the 'seed' of the system. The first generation is created by applying the above rules simultaneously to every cell in the seed — births and deaths happen simultaneously, and the discrete moment at which this happens is sometimes called a tick. (In other words, each generation is a pure function of the one before.) The rules continue to be applied repeatedly to create further generations..
 
 ## Links
 
 - Source: 
 - Bugs:
-- Documentation: [http://thirdlink.whatnot/whatever](http://loldamn.com/wp-content/uploads/2014/02/funny-little-fat-puppies-food.jpg)
+- Documentation: [http://www.conwaylife.com/w/index.php?title=Conway%27s_Game_of_Life](http://loldamn.com/wp-content/uploads/2014/02/funny-little-fat-puppies-food.jpg)
 
 ## Project Setup
 
