@@ -193,6 +193,6 @@ window.onload = function () {
             if (isGameStarted) {
                 iterationStarted(continueIterations);
             }
-        }, 1000);
+        }, 100);
     }
 };

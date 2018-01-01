@@ -14,7 +14,7 @@ gulp.task('default', ['lint', 'buildrun']);
 // ** Running ** //
 
 gulp.task('run', shell.task([
-  'http-server -o --cors'
+  'http-server -o --cors ./app/'
 ]));
 
 gulp.task('buildrun', function (cb) {
