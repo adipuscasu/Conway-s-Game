@@ -1,4 +1,4 @@
-# conway-game
+# Conway's Game of Life
 
 A typescript project, that displays  a finite two-dimensional orthogonal grid of square cells, each of which is in one of two possible states, live or dead. Every cell interacts with its eight neighbours, which are the cells that are directly horizontally, vertically, or diagonally adjacent. At each step in time, the following transitions occur:
 
