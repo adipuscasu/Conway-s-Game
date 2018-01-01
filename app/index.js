@@ -48,14 +48,12 @@ window.onload = function () {
         inputElement.addEventListener("click", function (e) {
             browserCellSize = $("input#cellSize") ? $("input#cellSize").val() : 0;
             cellSize = parseInt(browserCellSize, 10) > 0 ? parseInt(browserCellSize, 10) : 80;
-            console.log("click", cellSize);
             writeCellSize(cellSize);
             setCanvasCoords();
             init();
         });
     }
     if (elmStartGameButton) {
-        console.log("there is elmButton", elmStartGameButton);
         elmStartGameButton.addEventListener("click", function (event) {
             isGameStarted = !isGameStarted;
             buttonText = isGameStarted ? "Stop " : "Start ";
@@ -183,7 +181,6 @@ window.onload = function () {
         writeCellSize(cellSize);
         reDrawRectangle(cellSize);
         initGame(myArray, cellSize);
-        console.log(myArray, "elemLeft: ", elemCanvasCoordLeft, "elemTop: ", elemCanvasCoordTop);
         setCanvasCoords();
         drawGame(myArray);
         writeStartButtonLabel(buttonText);
