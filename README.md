@@ -13,6 +13,7 @@ The initial pattern constitutes the 'seed' of the system. The first generation i
 - Source: 
 - Bugs:
 - Documentation: [http://www.conwaylife.com/w/index.php?title=Conway%27s_Game_of_Life]
+- Live application: https://adipuscasu.github.io/Conway-s-Game/app/
 
 ## Project Setup
 
