@@ -27,40 +27,64 @@ function initGame(cellArray: Array<Cell>, cellSize: number) {
 }
 
 window.onload = function () {
-    let elmButton = document.getElementById("startGame");
+    const elmIterationsNumberLabel = document.getElementById("iterationsNumber");
+    let cellSurface = <HTMLCanvasElement> document.getElementById("cellSurface");
+    let browserCellSize: any = $( "input#cellSize" ) ? $( "input#cellSize" ).val()  : 0;
+    let inputElement = document.getElementById("cellSize");
+    let elmStartGameButton = document.getElementById("startGame");
     let drawingSurface = <HTMLCanvasElement> document.getElementById("drawingSurface");
-    let elemLeft = drawingSurface.offsetLeft;
-    let elemTop = drawingSurface.offsetTop;
+    let elemCanvasCoordLeft = drawingSurface.offsetLeft;
+    let elemCanvasCoordTop = drawingSurface.offsetTop;
     let ctxt = drawingSurface.getContext("2d");
-    let isGameStarted : boolean = false;
     let noOfGenerations : number = 0;
-    let counter : number = 0;
+    let isGameStarted : boolean = false;
+
     let evt = new Event("startGame", {"bubbles": true, "cancelable": true});
+
     let cancelled : boolean = false;
-    const cellSize: number = 80;
-    // watch for triggering the startGame event
-    document.addEventListener("startGame", function(e) {
-        console.log("test", e);
-        iterationStarted();
-    });
+    let cellSize: number = parseInt(browserCellSize, 10) > 0 ? parseInt(browserCellSize, 10) : 80;
 
     let myArray : Array<Cell> = new Array();
     let nextGenerationArray : Array<Cell> = new Array();
-    initGame(myArray, cellSize);
-    drawGame(myArray);
+    let buttonText: string = "Start game";
 
-    if (elmButton) {
-        elmButton.addEventListener("click", function(event){
+    // watch for triggering the startGame event a
+    document.addEventListener("startGame", function(e) {
+        if (isGameStarted) {
+            iterationStarted(continueIterations);
+        }
+    });
+
+    document.addEventListener("onchange", function () {
+        setCanvasCoords();
+    });
+
+    if (inputElement) {
+        inputElement.addEventListener("click", function (e) {
+            browserCellSize = $( "input#cellSize" ) ? $( "input#cellSize" ).val()  : 0;
+            cellSize = parseInt(browserCellSize, 10) > 0 ? parseInt(browserCellSize, 10) : 80;
+            console.log("click", cellSize);
+            writeCellSize(cellSize);
+            setCanvasCoords();
+            init();
+        });
+    }
+
+    if (elmStartGameButton) {
+        console.log("there is elmButton", elmStartGameButton);
+        elmStartGameButton.addEventListener("click", function(event){
             isGameStarted = !isGameStarted;
+            buttonText = isGameStarted ? "Stop " : "Start ";
+            buttonText += "game";
+            writeStartButtonLabel(buttonText);
             // Trigger the gameStart event here
             cancelled = !document.dispatchEvent(evt);
         });
     }
 
-
     drawingSurface.addEventListener("click", function(event){
-        let x = event.pageX - elemLeft,
-            y = event.pageY - elemTop;
+        let x = event.pageX - elemCanvasCoordLeft,
+            y = event.pageY - elemCanvasCoordTop;
         inverseCellLiveStatus({coordX: Math.floor(x / cellSize) * cellSize, coordY: Math.floor(y / cellSize) * cellSize});
         drawGame(myArray);
     });
@@ -80,7 +104,11 @@ window.onload = function () {
         });
     }
 
-    function inverseCellLiveStatus(coords: Coords){
+    setCanvasCoords();
+
+    init();
+
+    function inverseCellLiveStatus(coords: Coords) {
         myArray.forEach(function(cell){
             if (cell.cellCoords.coordX === coords.coordX && cell.cellCoords.coordY === coords.coordY) {
                 cell.isAlive = !cell.isAlive;
@@ -90,7 +118,7 @@ window.onload = function () {
 
     function getCellNeighbours (cell : Cell, cellArray: Array<Cell>) : number  {
         let liveCellsCount : number = 0;
-        // set the 8 neighbours coords
+        // set coords for the 8 neighbours
         let neighboursArray : Array<any> = new Array;
         neighboursArray.push([cell.cellCoords.coordX, cell.cellCoords.coordY - cell.cellWidth]);
         neighboursArray.push([cell.cellCoords.coordX, cell.cellCoords.coordY + cell.cellWidth]);
@@ -115,7 +143,7 @@ window.onload = function () {
         return liveCellsCount;
     }
 
-    function iterationStarted(){
+    function iterationStarted(callBack: () => void) {
             // process the next generation array
             nextGenerationArray = getNextGeneration(myArray);
             // replace the game array with the new generation array
@@ -125,6 +153,10 @@ window.onload = function () {
 
             noOfGenerations ++;
             writeIterationsNumber(noOfGenerations);
+            // continue the game iterations
+            if (typeof callBack === "function") {
+                callBack();
+            }
     }
 
     function getNextGeneration (cellArray: Array<Cell>){
@@ -152,10 +184,54 @@ window.onload = function () {
     }
 
     function writeIterationsNumber (iterationsNumber : number) {
-        const elmLabel = document.getElementById("iterationsNumber");
-        if (elmLabel) {
-            elmLabel.innerHTML = "Number of iterations : " + iterationsNumber;
+        if (elmIterationsNumberLabel) {
+            elmIterationsNumberLabel.innerHTML = "Number of iterations : " + iterationsNumber;
         }
+    }
+
+    function writeCellSize(cellSizeValue: number) {
+        const cellSizeLabel = document.getElementById("cellSizeLabel");
+        if (cellSizeLabel) {
+            cellSizeLabel.innerHTML = "Current cell size : " + cellSizeValue;
+        }
+    }
+
+    function writeStartButtonLabel(textToWrite: string){
+        if (elmStartGameButton) {
+            elmStartGameButton.innerHTML = textToWrite;
+        }
+    }
+
+    function reDrawRectangle(cellSizeValue: number){
+        if (cellSizeValue) {
+            $("#square").css("width", cellSizeValue);
+            $("#square").css("height", cellSizeValue);
+            $("#square").css("background", "black");
+        }
+    }
+
+    function setCanvasCoords() {
+        elemCanvasCoordLeft = drawingSurface.offsetLeft;
+        elemCanvasCoordTop = drawingSurface.offsetTop;
+    }
+
+    function init() {
+        myArray = new Array();
+        writeCellSize(cellSize);
+        reDrawRectangle(cellSize);
+        initGame(myArray, cellSize);
+        console.log(myArray, "elemLeft: ", elemCanvasCoordLeft, "elemTop: ", elemCanvasCoordTop);
+        setCanvasCoords();
+        drawGame(myArray);
+        writeStartButtonLabel(buttonText);
+    }
+
+    function continueIterations(){
+        setTimeout(function(){
+            if (isGameStarted) {
+                iterationStarted(continueIterations);
+            }
+        }, 1000);
     }
 
 };

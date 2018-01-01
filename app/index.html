@@ -14,6 +14,7 @@
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/main.css">
         <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        
     </head>
     <body>
         <!--[if lte IE 9]>
@@ -23,18 +24,29 @@
         <!-- Add your site or application content here -->
         <div  class="jumbotron">
             <div class="well well-lg">
-                    <canvas id="drawingSurface" width="400" height="400">
-                            Your browser does not support HTML5.
-                    </canvas>
+                    <div id="square"></div>
+                    <div>
+                            <input type="range" min="2" max = "400" value="80" id="cellSize"/>
+                            <label for="cellSize" id="cellSizeLabel">Current cell size: 80</label>
+                    </div>
+                    <div>
+                            <label id="iterationsNumber">Number of iterations : 0</label>
+                    </div>
+                    <div>
+                            <canvas id="drawingSurface" width="400" height="400">
+                                    Your browser does not support HTML5.
+                            </canvas>
+                    </div>
+                    
                     <div>
                         <button class="btn btn-default" id="startGame">Start game</button>
-                        <label class="pull-right" id="iterationsNumber">Number of iterations : 0</label>
                     </div>
                        
             </div>
                      
         </div>
         <script src="js/vendor/modernizr-3.5.0.min.js"></script>
+        <script src="js/vendor/system-production.js"></script>
         <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-3.2.1.min.js"><\/script>')</script>
         <script src="js/plugins.js"></script>
